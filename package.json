@@ -1,0 +1,14 @@
+{
+  "name": "fusiondb",
+  "private": true,
+  "version": "0.0.0",
+  "description": "FusionDB monorepo",
+  "packageManager": "pnpm@TO_BE_PINNED",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck"
+  }
+}

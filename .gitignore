@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# environment
+.env
+.env.*
+!.env.example
+
+# builds
+.next/
+dist/
+build/
+coverage/
+.turbo/
+
+# local infrastructure
+.infrastructure-data/
+data/
+*.pid
+
+# logs
+*.log
+logs/
+
+# editor/os
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# secrets and certificates
+*.pem
+*.key
+*.crt
+secrets/

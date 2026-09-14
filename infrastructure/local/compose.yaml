@@ -1,0 +1,48 @@
+name: fusiondb-local
+
+services:
+  control-db:
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fusion_control
+      POSTGRES_PASSWORD: fusion_control_local
+      POSTGRES_DB: fusion_control
+    ports:
+      - "5432:5432"
+    volumes:
+      - fusion_control_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fusion_control -d fusion_control"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - fusion-internal
+
+  project-db:
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fusion_internal_admin
+      POSTGRES_PASSWORD: fusion_project_admin_local
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - fusion_project_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fusion_internal_admin -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - fusion-internal
+
+networks:
+  fusion-internal:
+    name: fusiondb-local-internal
+
+volumes:
+  fusion_control_data:
+  fusion_project_data:

@@ -1,0 +1,78 @@
+name: FusionDB M001 CI
+on:
+  push:
+    branches: [main, 'feat/**', 'agent/**']
+  pull_request:
+
+jobs:
+  validate-m001:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      control-db:
+        image: postgres:18.4-alpine
+        env:
+          POSTGRES_USER: fusion_control
+          POSTGRES_PASSWORD: fusion_control_ci
+          POSTGRES_DB: fusion_control
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U fusion_control -d fusion_control"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      project-db:
+        image: postgres:18.4-alpine
+        env:
+          POSTGRES_USER: fusion_internal_admin
+          POSTGRES_PASSWORD: fusion_project_admin_ci
+          POSTGRES_DB: postgres
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U fusion_internal_admin -d postgres"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      NODE_ENV: test
+      CONTROL_DATABASE_URL: postgresql://fusion_control:fusion_control_ci@localhost:5432/fusion_control
+      PROJECT_DB_ADMIN_URL: postgresql://fusion_internal_admin:fusion_project_admin_ci@localhost:5433/postgres
+      PROJECT_DB_PUBLIC_HOST: localhost
+      PROJECT_DB_PUBLIC_PORT: '5433'
+      BETTER_AUTH_SECRET: fusiondb-ci-secret-that-is-longer-than-thirty-two-characters
+      BETTER_AUTH_URL: http://localhost:4000
+      FUSION_CONSOLE_URL: http://localhost:3000
+      FUSION_MASTER_KEY_B64: BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=
+      API_HOST: 127.0.0.1
+      API_PORT: '4000'
+      LOG_LEVEL: info
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.19.0'
+      - name: Install pnpm
+        run: npm install --global pnpm@11.4.0
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+      - name: Check toolchain
+        run: pnpm check:toolchain
+      - name: Apply control-plane migrations
+        run: pnpm db:migrate
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test
+      - name: Production build
+        run: pnpm build
+      - name: Start Control Plane API
+        run: |
+          pnpm --filter @fusiondb/api start > /tmp/fusion-api.log 2>&1 &
+          echo $! > /tmp/fusion-api.pid
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:4000/ready >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/fusion-api.log
+          exit 1
+      - name: M001 end-to-end verification
+        run: pnpm --filter @fusiondb/api test:e2e
+      - name: API log on failure
+        if: failure()
+        run: cat /tmp/fusion-api.log || true

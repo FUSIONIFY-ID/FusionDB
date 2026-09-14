@@ -3,12 +3,25 @@
   "private": true,
   "version": "0.0.0",
   "description": "FusionDB monorepo",
-  "packageManager": "pnpm@TO_BE_PINNED",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": "11.4.0"
+  },
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
     "test": "turbo test",
-    "typecheck": "turbo typecheck"
+    "db:up": "docker compose -f infrastructure/local/compose.yaml up -d",
+    "db:down": "docker compose -f infrastructure/local/compose.yaml down",
+    "db:reset": "docker compose -f infrastructure/local/compose.yaml down -v",
+    "db:logs": "docker compose -f infrastructure/local/compose.yaml logs -f",
+    "db:migrate": "pnpm --filter @fusiondb/auth migrate && pnpm --filter @fusiondb/database migrate",
+    "check:toolchain": "node scripts/check-toolchain.mjs"
+  },
+  "devDependencies": {
+    "turbo": "2.10.6",
+    "typescript": "6.0.3"
   }
 }

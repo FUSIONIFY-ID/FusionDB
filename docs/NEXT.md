@@ -1,32 +1,36 @@
 # Next Action
 
-Do not add product features yet.
+## Current target: M001-B/C
 
-## Immediate task
+The repository now contains the Control Plane model, management auth, project provisioning, encrypted direct credentials, and an M001 E2E test.
 
-Initialize the actual toolchain and complete **Milestone M001**.
+### Validate in GitHub Actions
 
-### Toolchain
+Push the increment and wait for `FusionDB M001 CI`.
 
-- Pin Node.js version
-- Pin pnpm version
-- Install Turborepo
-- Initialize Next.js in `apps/console`
-- Initialize Fastify in `apps/api`
-- Add Drizzle + PostgreSQL control-plane schema
-- Add Better Auth management authentication
-- Add Docker Compose for local PostgreSQL services
-
-### First vertical slice
+A green workflow proves:
 
 ```text
 Sign Up
--> Create Organization
--> Create Project
--> Provision PostgreSQL DB
--> Generate Restricted Credential
--> Connect from External Node.js
--> Verify Cross-Project Isolation
+-> Organization
+-> Project A provisioned
+-> Project B provisioned
+-> Node.js connects to Project A
+-> CREATE / INSERT / SELECT
+-> Project A credential -> Project B = DENIED
 ```
 
-No MCP, ClickHouse, analytics, storage, or AI agent code until this slice works.
+### After M001 goes green
+
+Proceed to M002 Database Management:
+
+- project database introspection
+- table list
+- create table
+- columns
+- rows editor
+- foreign keys
+- indexes
+- SQL Editor
+
+Do not start ClickHouse, MCP, AgentGuard, analytics, storage, or the marketing site yet.

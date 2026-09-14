@@ -68,3 +68,32 @@ Initialize the toolchain and build Milestone M001:
 7. Project PostgreSQL creation
 8. Generated credentials
 9. External Node.js connection test
+
+## Local Bootstrap (M001-A)
+
+The initial toolchain is pinned to Node.js 24 and pnpm 11.4.0.
+
+```bash
+npm install --global pnpm@11.4.0
+pnpm install
+cp .env.example .env
+pnpm db:up
+pnpm dev
+```
+
+- Console: `http://localhost:3000`
+- Control API: `http://localhost:4000`
+- API health: `http://localhost:4000/health`
+
+See `docs/03-M001-RUNBOOK.md` for verification and the next implementation step.
+
+## M001 Implementation Status
+
+- Bootstrap: implemented
+- Control Plane metadata: implemented
+- Better Auth management identity: implemented
+- PostgreSQL project provisioner: implemented
+- Encrypted connection credentials: implemented
+- Cross-project isolation E2E: implemented in GitHub Actions
+
+See `docs/04-M001-CONTROL-PLANE.md`.
